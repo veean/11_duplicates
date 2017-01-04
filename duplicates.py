@@ -1,10 +1,11 @@
 import os
 import hashlib
+import sys
 
 
 def find_duplicates(path):
     hash_table = {}
-    for dirs, subdirs, files in os.walk(path):
+    for dirs, _, files in os.walk(path):
         for file in files:
             path_to_file = os.path.join(dirs, file)
             file_hash = hashlib.md5(open(path_to_file, 'rb').read()).hexdigest()
@@ -16,7 +17,7 @@ def find_duplicates(path):
 
 def are_files_duplicates(path_to_analyze):
     files_table = find_duplicates(path_to_analyze)
-    results = [x for x in files_table.values() if len(x) > 1]
+    results = [x for x in files_table.values() if len(x) > 1] # "len(x) > 1" - ключ словаря имеет несколько значений
     if results:
         for result in results:
             for result_part in result:
@@ -26,5 +27,15 @@ def are_files_duplicates(path_to_analyze):
 
 
 if __name__ == '__main__':
-    # find_duplicates('.')
-    are_files_duplicates('C:\\Users\\root\\Desktop\\123')
+
+    try:
+        if sys.argv[1]:
+            start_path = str(sys.argv[1])
+            if not os.path.exists(start_path):
+                print("Invalid directory!")
+            else:
+                print('Duplicate files list :')
+                are_files_duplicates(start_path)
+
+    except IndexError as e:
+        print("Choose directory to search ...")
