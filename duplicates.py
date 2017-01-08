@@ -1,23 +1,27 @@
 import os
-import hashlib
 import sys
 
 
 def find_duplicates(path):
-    hash_table = {}
+    size_and_path_table = {}
     for dirs, _, files in os.walk(path):
         for file in files:
             path_to_file = os.path.join(dirs, file)
-            file_hash = hashlib.md5(open(path_to_file, 'rb').read()).hexdigest()
-            if file_hash in hash_table:
-                hash_table[file_hash].append(path_to_file)
+            file_size = os.path.getsize(path_to_file)
+            if file_size in size_and_path_table:
+                size_and_path_table[file_size].append(path_to_file)
             else:
-                hash_table[file_hash] = [path_to_file]
-    return hash_table
+                size_and_path_table[file_size] = [path_to_file]
+    return size_and_path_table
+
+
+def has_duplicates(filename_entries):
+    return len(filename_entries) > 1
+
 
 def are_files_duplicates(path_to_analyze):
     files_table = find_duplicates(path_to_analyze)
-    results = [x for x in files_table.values() if len(x) > 1] # "len(x) > 1" - ключ словаря имеет несколько значений
+    results = [x for x in files_table.values() if has_duplicates(x)]
     if results:
         for result in results:
             for result_part in result:
